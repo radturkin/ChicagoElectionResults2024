@@ -17,6 +17,8 @@ from shapely import wkt
 
 st.title("Chicago Election Results 2024")
 
+
+
 @st.cache_data
 def load_data():
     df_merged = gpd.read_file("https://raw.githubusercontent.com/radturkin/ChicagoElectionResults2024/refs/heads/main/merged_chicago_elections_1.geojson")
@@ -26,12 +28,31 @@ def load_data():
     df_merged["geometry"] = (
         df_merged.to_crs(df_merged.estimate_utm_crs()).simplify(10).to_crs(df_merged.crs)
     )
-    return df_merged
+    polling_locations='https://raw.githubusercontent.com/radturkin/ChicagoElectionResults2024/refs/heads/main/polling_locations.geojson'
+    df_polling_locations=gpd.read_file(polling_locations,  driver="GeoJSON")
+    
+    # Extract latitude and longitude from the geometry column
+    df_polling_locations['latitude'] = df_polling_locations['geometry'].apply(lambda p: p.y if p else None)
+    df_polling_locations['longitude'] = df_polling_locations['geometry'].apply(lambda p: p.x if p else None)
 
-df_merged = load_data()
+    return df_merged, df_polling_locations
+
+df_merged, df_polling_locations = load_data()
+
+# Create the scatter_mapbox plot
+fig = px.scatter_mapbox(df_polling_locations,
+                        lat="latitude",
+                        lon="longitude",
+                        hover_name="Polling Place Address", # Or another relevant column for hover info
+                        hover_data={"latitude":False, "longitude":False},
+                        zoom=10,
+                        center={"lat": 41.8781, "lon": -87.6298}, 
+                        mapbox_style="carto-positron")
+
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
 # Create the choropleth map
-fig = px.choropleth_mapbox(df_merged,
+fig2 = px.choropleth_mapbox(df_merged,
                            geojson=df_merged.geometry,
                            locations=df_merged.index,
                            color='Kamala',
@@ -43,6 +64,11 @@ fig = px.choropleth_mapbox(df_merged,
                            hover_data={'Kamala %': True, 'Trump %': True, 'Kamala': False},
                            color_continuous_scale='RdBu')
 
-fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+fig2.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-st.plotly_chart(fig)
+
+# Add the scatter plot traces to the choropleth figure
+for trace in fig['data']:
+    fig2.add_trace(trace)
+    
+st.plotly_chart(fig2)
