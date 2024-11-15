@@ -50,6 +50,7 @@ fig = px.scatter_mapbox(df_polling_locations,
                         mapbox_style="carto-positron")
 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.update_traces(marker=dict(color='black'))
 
 # Create the choropleth map
 fig2 = px.choropleth_mapbox(df_merged,
