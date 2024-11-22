@@ -12,4 +12,5 @@ Some noticeable items in the 50th Ward include unusual polling location clusteri
 - Cleaner user interface and instructions
 - Options to select specific data and Wards
 - Data on Chicago School Board results
-- Additional information and resources 
+- Additional information and resources
+- Finishing this readme
