@@ -21,7 +21,7 @@ st.title("Chicago Election Results 2024")
 
 @st.cache_data
 def load_data():
-    df_merged = gpd.read_file("https://raw.githubusercontent.com/radturkin/ChicagoElectionResults2024/refs/heads/main/merged_chicago_elections_1.geojson")
+    df_merged = gpd.read_file("https://raw.githubusercontent.com/radturkin/ChicagoElectionResults2024/refs/heads/main/merged_chicago_elections_3.geojson")
     # df_merged['geometry'] = df_merged['geometry'].apply(wkt.loads)
     df_merged = gpd.GeoDataFrame(df_merged, geometry='geometry')
     df_merged.set_crs(epsg=4326, inplace=True)
@@ -62,7 +62,7 @@ fig2 = px.choropleth_mapbox(df_merged,
                            center={"lat": 41.8781, "lon": -87.6298},
                            opacity=0.5,
                            hover_name="ward_precinct",
-                           hover_data={'Kamala %': True, 'Trump %': True, 'Kamala': False},
+                           hover_data={'Kamala %': True, 'Trump %': True, 'Kamala': False, 'Turnout': True},
                            color_continuous_scale='RdBu')
 
 fig2.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
